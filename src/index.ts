@@ -12,10 +12,16 @@ async function init() {
         const app = express();
         app.use(bodyParser.json())
 
+        app.get("/", (req, res) => {
+            res.status(200).json({
+                message: "Server is Running",
+                data: null,
+            })
+        });
 
-        app.use('/api', router);
+
         const PORT = 3000
-
+        app.use('/api', router);
         app.listen(PORT, () => {
             console.log(`Server is Running on http://localhost:${PORT}`);
         })
