@@ -1,0 +1,2 @@
+"dev": "ts-node-dev src/index.ts",
+"ts-node-dev": "^2.0.0",
