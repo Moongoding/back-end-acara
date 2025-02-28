@@ -11,7 +11,7 @@ const doc = {
             url: "http://localhost:3000/api",
             description: "Local Server",
         }, {
-            url: "https://back-end-acara-khaki.vercel.app/",
+            url: "https://back-end-acara-khaki.vercel.app/api",
             description: "Deploy Server",
         }
     ],
