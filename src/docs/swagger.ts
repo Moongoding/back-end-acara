@@ -27,9 +27,19 @@ const doc = {
                 "indentifier": "krisma",
                 "password": "password123",
             },
-        }
-    }
-}
+            RegisterRequest: {
+                fullName: "Joni Joni",
+                username: "joni2024",
+                email: "kunanta@yopmail.com",
+                password: "password123",
+                confirmPassword: "password123"
+            },
+            ActivationRequest: {
+                code: "AudioBufferSourceNode",
+            },
+        },
+    },
+};
 const outputFile = "./swagger_output.json";
 const endpointsFiles = ["../routes/api.ts"];
 swaggerAutogen({ openapi: "3.0.0" })(outputFile, endpointsFiles, doc);

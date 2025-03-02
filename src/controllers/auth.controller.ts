@@ -30,7 +30,15 @@ const registerValidateSchema = Yup.object({
 })
 
 export default {
+
     async register(req: Request, res: Response) {
+        /**
+            #swagger.tags = ['Auth']
+            #swagger.requestBody = {
+                required:true,
+                schema:{$ref:'#/components/schemas/RegisterRequest'}
+            }
+        */
         const { username, fullName, email, password, confirmPassword } =
             req.body as unknown as TRegister;
 
@@ -64,11 +72,10 @@ export default {
         }
     },
 
-
-
     async login(req: Request, res: Response) {
 
         /**
+            #swagger.tags = ['Auth']
             #swagger.requestBody = {
             required:true,
             schema:{$ref:"#/components/schemas/LoginRequest"}
@@ -88,7 +95,8 @@ export default {
                     {
                         username: indentifier,
                     },
-                ]
+                ],
+                isActive: true,
             });
             if (!userByIndentifier) {
                 return res.status(403).json({
@@ -132,8 +140,9 @@ export default {
 
     async me(req: IReqUser, res: Response) {
         /**
-        #swagger.security =[{
-        "bearerAuth":[]
+            #swagger.tags = ['Auth']
+            #swagger.security =[{
+            "bearerAuth":[]
         }]
          */
         try {
@@ -162,7 +171,43 @@ export default {
             res.status(400).json({
                 message: err.message,
                 data: null,
-            })
+            });
         }
-    }
+    },
+
+    async activation(req: Request, res: Response) {
+
+        /**
+            #swagger.tags = ['Auth']
+            #swagger.requestBody = {
+                required:true,
+                schema:{$ref:'#/components/schemas/ActivationRequest'}
+            }
+         */
+
+        try {
+            const { code } = req.body as { code: string };
+
+            const user = await UserModel.findOneAndUpdate({
+                activationCode: code,
+            }, {
+                isActive: true,
+            }, {
+                new: true,
+            });
+
+            res.status(200).json({
+                message: "User Successfully activated",
+                data: user,
+            });
+
+        } catch (error) {
+            const err = error as unknown as Error;
+            // const err = error as Yup.ValidationError;
+            res.status(400).json({
+                message: err.message,
+                data: null,
+            });
+        }
+    },
 }

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acara</title>
+    <style>
+        /* Reset some default styles */
+        body, h1, p, ul, li, a {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f4f4f4;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            color: #1a73e8;
+            margin: 0;
+        }
+
+        .content {
+            margin-bottom: 20px;
+        }
+
+        .content p {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .content ul {
+            margin: 20px 0;
+            padding-left: 20px;
+        }
+
+        .content ul li {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        /* Updated button style */
+        .button {
+            display: inline-block;
+            background-color: #1a73e8;
+            color: #fff;
+            padding: 10px 18px; /* Reduced padding */
+            font-size: 14px;    /* Slightly smaller font size */
+            text-align: center;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+            transition: all 0.3s ease; /* Smooth transition effect */
+            border: 2px solid transparent; /* Transparent border */
+        }
+
+        .button:hover {
+            background-color: #155ab6;
+            border-color: #1a73e8; /* Adds border color on hover */
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 14px;
+            color: #888;
+            margin-top: 30px;
+        }
+
+        .footer p {
+            margin: 10px 0;
+        }
+
+        /* Responsive Design */
+        @media only screen and (max-width: 600px) {
+            .container {
+                padding: 15px; /* Reduced padding for smaller screens */
+                width: 100%;   /* Ensure full width on small devices */
+            }
+
+            .header h1 {
+                font-size: 20px; /* Smaller font size for smaller devices */
+            }
+
+            .content p, .content ul li {
+                font-size: 14px; /* Smaller text size for content */
+            }
+
+            .button {
+                padding: 8px 14px; /* Reduced padding for buttons */
+                font-size: 12px;   /* Smaller button font size */
+            }
+
+            .footer p {
+                font-size: 12px;   /* Smaller text for footer */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>
+                Selamat datang 
+            </h1>
+        </div>
+        <div class="content">
+            <p>Halo <%= username %>, </p>
+            <p>Terimakasih telah mendaftar di layanan kami. Berikut adalah informasi dari akun anda</p>
+            <ul>
+                <li>
+                    <strong>Nama : <%= fullname %></strong>
+                </li>
+                <li>
+                    <strong>Email : <%= email %></strong>
+                </li>
+                <li>
+                    <strong>Tanggal Pendaftaran : <%= createdAt %></strong>
+                </li>
+            </ul>
+            <p>untuk memulai silakan klik tombol berikut :</p>
+            <a href="<%= activationUrl %>" class="button">Aktifkan Akun</a>
+
+            <p>
+                Jika anda memiliki pertanyaan, jangan ragu untuk menghubungi kami
+            </p>
+
+            <p>
+                Salam Hangat, Acara
+            </p>
+        </div>
+        <div class="footer">
+            <p>
+                &copf; 2025 Acara event management System. Semua hak dilindungi.
+            </p>
+        </div>
+    </div>
+</body>
+</html>
