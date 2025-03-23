@@ -3,7 +3,9 @@ import * as Yup from "yup";
 import UserModel from "../models/user.model";
 import { encrypt } from "../utills/encryption";
 import { generateToken } from "../utills/jwt";
-import { IReqUser } from "../middleware/auth.Middleware";
+import { IReqUser } from "../utills/intercace";
+import { CLIENT_HOST, EMAIL_SMTP_USER } from "../utills/env";
+import { renderMailHtml, sendMail } from "../utills/mail/mail";
 
 type TRegister = {
     fullName: string;
@@ -42,7 +44,18 @@ export default {
         const { username, fullName, email, password, confirmPassword } =
             req.body as unknown as TRegister;
 
+        console.log("------------------------")
+        console.log("📥 Data register masuk:", { username, fullName, email });
+        console.log("------------------------")
+
+        const session = await UserModel.startSession();
+        session.startTransaction(); // Mulai transaksi
+
         try {
+            console.log("------------------------")
+            console.log("🔍 Validasi data...");
+            console.log("------------------------")
+
             await registerValidateSchema.validate({
                 fullName,
                 username,
@@ -51,20 +64,95 @@ export default {
                 confirmPassword,
             });
 
-            const result = await UserModel.create({
+
+            console.log("------------------------")
+            console.log("🔎 Mengecek apakah email sudah terdaftar...");
+            console.log("------------------------")
+
+            // Cek apakah email sudah terdaftar sebelum membuat user baru
+            const existingUser = await UserModel.findOne({ email }).session(session);
+            if (existingUser) {
+                console.log("------------------------")
+                console.log("⚠️ Email sudah digunakan:", email);
+                console.log("------------------------")
+
+                await session.abortTransaction();
+                session.endSession();
+                return res.status(400).json({
+                    message: "Email sudah terdaftar, gunakan email lain.",
+                    data: null,
+                });
+            }
+
+            // Jika email belum terdaftar, lanjutkan pembuatan user
+
+            console.log("------------------------")
+            console.log("📝 Membuat user baru...");
+            console.log("------------------------")
+
+            // const result = await UserModel.create({
+            const user = new UserModel({
                 fullName,
                 email,
                 username,
-                password,
+                password, // di enkrip sebelum di simpan
             });
 
+            // Simpan user(result) sementara dalam transaksi
+            await user.save({ session });
+            console.log("------------------------")
+            console.log("✅ User berhasil dibuat, tetapi belum dikomit ke database.");
+            console.log("------------------------")
+
+
+
+            console.log("------------------------")
+            console.log("✉️ Menyiapkan email aktivasi...");
+            console.log("------------------------")
+
+            const activationLink = `${CLIENT_HOST}/auth/activation?code=${user.activationCode}`; // Buat activation link
+            const contentMail = await renderMailHtml("registration-success.ejs", {             // Render HTML untuk email
+                username: user.username,
+                fullName: user.fullName,
+                email: user.email,
+                createdAt: user.createdAt,
+                activationLink: activationLink,
+            });
+
+            // Kirim email aktivasi
+            console.log("------------------------")
+            console.log("🚀 Mengirim email aktivasi ke:", user.email);
+            console.log("------------------------")
+            await sendMail({
+                from: EMAIL_SMTP_USER,
+                to: user.email,
+                subject: "Aktivasi Akun Anda",
+                html: contentMail,
+            });
+
+            // Jika email berhasil dikirim, commit transaksi
+            await session.commitTransaction();
+            session.endSession();
+            console.log("🎉 Data user dan email aktivasi berhasil disimpan!");
+
             res.status(200).json({
-                message: "Succsess Registration!",
-                data: result,
-            })
-        } catch (error) {
+                message: "Registrasi berhasil! Silakan cek email untuk aktivasi akun.",
+                data: null,
+            });
+
+        } catch (error: any) {
+            console.error("❌ Error dalam registrasi:", error.message);
+            await session.abortTransaction(); // Batalkan transaksi jika ada error
+            session.endSession();
+
+            if (error.code === 11000) {
+                console.log("⚠️ Duplicate email error:", email);
+                return res.status(400).json({
+                    message: "Email sudah digunakan, silakan gunakan email lain.",
+                    data: null,
+                });
+            }
             const err = error as unknown as Error;
-            // const err = error as Yup.ValidationError;
             res.status(400).json({
                 message: err.message,
                 data: null,

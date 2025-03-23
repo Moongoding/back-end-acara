@@ -1,11 +1,11 @@
 import { NextFunction, Request, Response } from "express";
-import { IUserToken, getUserData } from "../utills/jwt";
+import { getUserData } from "../utills/jwt";
+import { IReqUser } from "../utills/intercace";
 
 
-export interface IReqUser extends Request {
-    user?: IUserToken;
-}
+
 export default (req: Request, res: Response, next: NextFunction) => {
+    console.log("auth.middleware is running!");
     const authorization = req.headers.authorization;
     if (!authorization) {
         return res.status(403).json({
@@ -13,6 +13,7 @@ export default (req: Request, res: Response, next: NextFunction) => {
             data: null,
         });
     }
+    console.log("authorization success ", authorization);
 
     const [prefix, accessToken] = authorization.split(" ")
     if (!(prefix === "Bearer" && accessToken)) {

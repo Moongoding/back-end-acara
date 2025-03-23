@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import { DATABASE_URL } from "./env";
 
+mongoose.set("strictQuery", false);
+
 
 const connect = async () => {
     try {

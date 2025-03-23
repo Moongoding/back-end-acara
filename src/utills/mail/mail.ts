@@ -46,9 +46,13 @@ export const renderMailHtml = async (template: string, data: any): Promise<strin
     //     path.join(__dirname, `templates/${template}`),
     //     data
     // );
+    console.log("------------------------")
+    console.log("🔎 Data Masuk ke mail.ts");
+    console.log("------------------------")
+
     const templatePath = path.join(__dirname, `templates/${template}`);
 
-    console.log('Template Path:', templatePath);
+    console.log('Template berada di:', templatePath);
     const content = await ejs.renderFile(templatePath, data);
     return content as string;
     // return content as string

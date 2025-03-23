@@ -5,6 +5,7 @@ import { CallbackError } from 'mongoose';
 import { render } from "ejs";
 import { register } from "ts-node";
 import { CLIENT_HOST, EMAIL_SMTP_USER } from "../utills/env";
+import { ROLES } from "../utills/constanst";
 
 
 export interface User {
@@ -32,7 +33,8 @@ const UserSchema = new Schema<User>({
     email: {
         type: Schema.Types.String,
         required: true,
-        unique: true
+        unique: true,
+        lowercase: true
     },
     password: {
         type: Schema.Types.String,
@@ -40,8 +42,8 @@ const UserSchema = new Schema<User>({
     },
     role: {
         type: Schema.Types.String,
-        enum: ["admin", "user"],
-        default: "user",
+        enum: [ROLES.ADMIN, ROLES.MEMBER],
+        default: ROLES.MEMBER,
     },
     profilePicture: {
         type: Schema.Types.String,
@@ -53,88 +55,77 @@ const UserSchema = new Schema<User>({
     },
     activationCode: {
         type: Schema.Types.String,
-
     }
 }, {
     timestamps: true,
 });
+UserSchema.index({ email: 1 }, { unique: true });
 
-// Pre-save middleware untuk mengenkripsi password dan generate activation code
-
+// Middleware untuk mengenkripsi password dan generate activation code sebelum disimpan
 UserSchema.pre("save", function (next) {
-    const user = this;
-    user.password = encrypt(user.password);
-    // Enkripsi activation code dari ID user + password yang sudah terenkripsi
-    user.activationCode = encrypt(user._id.toString() + user.password);
-    // user.activationCode = encrypt(user.id);
+
+    if (this.isModified("password")) {
+        console.log("------------------------")
+        console.log("🔒 Mengenkripsi password untuk user:", this.email);
+        console.log("------------------------")
+        this.password = encrypt(this.password)
+    }
+
+    if (!this.activationCode) {
+        console.log("------------------------")
+        console.log("🔑 Membuat activation code untuk:", this.email);
+        console.log("------------------------")
+        this.activationCode = encrypt(this._id.toString() + this.password);
+    }
+
     next();
+    // const user = this;
+    // user.password = encrypt(user.password);
+    // // Enkripsi activation code dari ID user + password yang sudah terenkripsi
+    // user.activationCode = encrypt(user._id.toString() + user.password);
+    // // user.activationCode = encrypt(user.id);
 });
 
-
+// Sekarang fungsinya pindah ke controller
 // UserSchema.post("save", async function (doc, next) {
 //     const user = doc;
 
-//     console.log("Send Email to :", user.email);
+//     try {
 
-//     const contentMail = await renderMailHtml("registration-succsess.ejs", {
-//         username: user.username,
-//         fullName: user.fullName,
-//         email: user.email,
-//         createdAt: user.createdAt,
-//         // activationLink: `${CLIENT_HOST}/auth/activation?code=${user.activationCode}`
-//         activationLink: `${CLIENT_HOST}/auth/activation?code=${user.activationCode}`,
-//     });
+//         console.log("Fullname:", user.fullName);
+//         console.log("createdAt:", user.createdAt);
+//         console.log("activationLink:", user.activationCode);
 
-//     await sendMail({
-//         from: "ilmasulis29@gmail.com",
-//         to: user.email,
-//         subject: "Aktivasi Akun Anda",
-//         html: contentMail,
-//     });
 
-//     next();
+//         // Render HTML untuk email
+//         const contentMail = await renderMailHtml("registration-success.ejs", {
+//             username: user.username,
+//             fullName: user.fullName,
+//             email: user.email,
+//             createdAt: user.createdAt,
+//             activationLink: `${CLIENT_HOST}/auth/activation?code=${user.activationCode}`,
+//         });
+
+//         // Kirim email
+//         await sendMail({
+//             from: EMAIL_SMTP_USER,
+//             to: user.email,
+//             subject: "Aktivasi Akun Anda",
+//             html: contentMail,
+//         });
+//         console.log("Send Email to:", user.email);
+
+//         next(); // Panggil next() untuk melanjutkan proses setelah email dikirim
+//     } catch (error) {
+//         console.error("Terjadi kesalahan saat mengirim email:", error);
+//         // Jika ada error, kita bisa memanggil next dengan error atau melakukan penanganan lainnya
+//         next(error as CallbackError); // Untuk melanjutkan dengan error jika diperlukan
+//     } finally {
+
+//         // console.log("Proses pengiriman email selesai.");
+//         next();
+//     }
 // });
-
-
-UserSchema.post("save", async function (doc, next) {
-    const user = doc;
-
-    try {
-
-        console.log("Fullname:", user.fullName);
-        console.log("createdAt:", user.createdAt);
-        console.log("activationLink:", user.activationCode);
-
-
-        // Render HTML untuk email
-        const contentMail = await renderMailHtml("registration-success.ejs", {
-            username: user.username,
-            fullName: user.fullName,
-            email: user.email,
-            createdAt: user.createdAt,
-            activationLink: `${CLIENT_HOST}/auth/activation?code=${user.activationCode}`,
-        });
-
-        // Kirim email
-        await sendMail({
-            from: EMAIL_SMTP_USER,
-            to: user.email,
-            subject: "Aktivasi Akun Anda",
-            html: contentMail,
-        });
-        console.log("Send Email to:", user.email);
-
-        next(); // Panggil next() untuk melanjutkan proses setelah email dikirim
-    } catch (error) {
-        console.error("Terjadi kesalahan saat mengirim email:", error);
-        // Jika ada error, kita bisa memanggil next dengan error atau melakukan penanganan lainnya
-        next(error as CallbackError); // Untuk melanjutkan dengan error jika diperlukan
-    } finally {
-
-        // console.log("Proses pengiriman email selesai.");
-        next();
-    }
-});
 
 
 UserSchema.methods.toJSON = function () {
