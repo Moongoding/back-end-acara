@@ -6,6 +6,7 @@ import { generateToken } from "../utills/jwt";
 import { IReqUser } from "../utills/intercace";
 import { CLIENT_HOST, EMAIL_SMTP_USER } from "../utills/env";
 import { renderMailHtml, sendMail } from "../utills/mail/mail";
+import response from "../utills/response";
 
 type TRegister = {
     fullName: string;
@@ -131,14 +132,11 @@ export default {
             });
 
             // Jika email berhasil dikirim, commit transaksi
-            await session.commitTransaction();
+            const result = await session.commitTransaction();
             session.endSession();
             console.log("🎉 Data user dan email aktivasi berhasil disimpan!");
 
-            res.status(200).json({
-                message: "Registrasi berhasil! Silakan cek email untuk aktivasi akun.",
-                data: null,
-            });
+            response.success(res, result, "Registrasi berhasil! Silakan cek email untuk aktivasi akun.");
 
         } catch (error: any) {
             console.error("❌ Error dalam registrasi:", error.message);
@@ -152,11 +150,7 @@ export default {
                     data: null,
                 });
             }
-            const err = error as unknown as Error;
-            res.status(400).json({
-                message: err.message,
-                data: null,
-            })
+            response.error(res, error, "Failed Registration");
         }
     },
 
@@ -187,10 +181,7 @@ export default {
                 isActive: true,
             });
             if (!userByIndentifier) {
-                return res.status(403).json({
-                    message: "User not Found",
-                    data: null
-                });
+                return response.unauthorized(res, "User not Found");
             }
 
             // Validasi Password
@@ -198,10 +189,7 @@ export default {
                 encrypt(password) === userByIndentifier.password;
 
             if (!validatePassword) {
-                return res.status(403).json({
-                    message: "User not Found",
-                    data: null
-                });
+                return response.unauthorized(res, "User not Found");
             }
 
             const token = generateToken({
@@ -209,20 +197,16 @@ export default {
                 role: userByIndentifier.role,
             });
 
-            res.status(200).json({
-                message: "Login Success",
-                // data: userByIndentifier,
-                data: token,
-            })
+            // res.status(200).json({
+            //     message: "Login Success",
+            //     // data: userByIndentifier,
+            //     data: token,
+            // })
+            response.success(res, token, "Login Success");
 
 
         } catch (error) {
-            const err = error as unknown as Error;
-            // const err = error as Yup.ValidationError;
-            res.status(400).json({
-                message: err.message,
-                data: null,
-            })
+            response.error(res, error, "Login Failed");
         }
     },
 
@@ -249,17 +233,9 @@ export default {
                     data: null
                 });
             }
-            res.status(200).json({
-                message: "Succses get user Profile",
-                data: result
-            })
+            response.success(res, result, "Success get user Profile");
         } catch (error) {
-            const err = error as unknown as Error;
-            // const err = error as Yup.ValidationError;
-            res.status(400).json({
-                message: err.message,
-                data: null,
-            });
+            response.error(res, error, "Failede get user Profile");
         }
     },
 
@@ -283,19 +259,9 @@ export default {
             }, {
                 new: true,
             });
-
-            res.status(200).json({
-                message: "User Successfully activated",
-                data: user,
-            });
-
+            response.success(res, user, "User Successfully activated");
         } catch (error) {
-            const err = error as unknown as Error;
-            // const err = error as Yup.ValidationError;
-            res.status(400).json({
-                message: err.message,
-                data: null,
-            });
+            response.error(res, error, "User is failed activated");
         }
     },
 }

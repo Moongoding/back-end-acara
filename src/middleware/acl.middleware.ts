@@ -1,5 +1,6 @@
 import { Response, NextFunction } from "express";
 import { IReqUser } from "../utills/intercace";
+import response from "../utills/response";
 
 export default (roles: string[]) => {
     return (req: IReqUser, res: Response, next: NextFunction) => {
@@ -12,10 +13,7 @@ export default (roles: string[]) => {
         console.log("Roles yang diizinkan:", roles);
 
         if (!role || !roles.includes(role)) {
-            return res.status(403).json({
-                data: null,
-                message: "Forbidden",
-            });
+            return response.unauthorized(res, "forbidden");
         }
         next();
     };
