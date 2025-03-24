@@ -1,4 +1,5 @@
 import { Response } from "express";
+import mongoose from "mongoose";
 import * as Yup from "yup";
 
 
@@ -20,15 +21,49 @@ export default {
     },
 
     error(res: Response, error: unknown, message: string) {
+        console.error("Error caught:", error);
+
         if (error instanceof Yup.ValidationError) {
             return res.status(400).json({
                 meta: {
                     status: 400,
                     message,
                 },
-                data: error.errors,
+                // data: { [`${error.path}`]: error.errors[0], }
+                data: error.path ? { [error.path]: error.errors[0] } : error.errors,
+            });
+        };
+
+        if (error instanceof mongoose.Error) {
+            return res.status(500).json({
+                meta: {
+                    status: 500,
+                    message: error.message || "Database error",
+                },
+                data: error.name,
+            });
+        };
+
+        // if ((error as any)?.code) {
+        if (typeof error === "object" && error !== null && "code" in error) {
+            const _err = error as any;
+            return res.status(500).json({
+                meta: {
+                    status: 500,
+                    // message: _err.errorResponse.errmsg,
+                    message: _err.errorResponse?.errmsg || "Unknown database error",
+                },
+                data: _err,
             });
         }
+
+        res.status(500).json({
+            meta: {
+                status: 500,
+                message,
+            },
+            data: error,
+        });
     },
 
     unauthorized(res: Response, message: string = "unauthorized") {
