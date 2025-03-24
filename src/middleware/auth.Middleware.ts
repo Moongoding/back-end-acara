@@ -6,12 +6,15 @@ import response from "../utills/response";
 
 
 export default (req: Request, res: Response, next: NextFunction) => {
+    console.log("--------------------------------------");
     console.log("auth.middleware is running!");
+    console.log("--------------------------------------");
     const authorization = req.headers.authorization;
     if (!authorization) {
         return response.unauthorized(res);
     }
-    console.log("authorization success ", authorization);
+    console.log("authorization success : ", authorization);
+    console.log("--------------------------------------");
 
     const [prefix, accessToken] = authorization.split(" ")
     if (!(prefix === "Bearer" && accessToken)) {

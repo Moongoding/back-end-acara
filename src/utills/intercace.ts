@@ -18,3 +18,9 @@ export interface IUserToken extends Omit
 export interface IReqUser extends Request {
     user?: IUserToken;
 }
+
+export interface IPaginationQuery {
+    page: number;
+    limit: number;
+    search: string;
+}
