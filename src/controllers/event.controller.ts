@@ -1,62 +1,56 @@
 import { Response } from "express";
 import { IPaginationQuery, IReqUser } from "../utills/intercace";
-import CategoryModel, { categoryDAO } from "../models/category.model";
 import response from "../utills/response";
+import EventModel, { TEvent, eventDAO } from "../models/event.model";
+import { FilterQuery } from "mongoose";
 
 export default {
     async create(req: IReqUser, res: Response) {
         try {
-            await categoryDAO.validate(req.body);
-            const result = await CategoryModel.create(req.body);
-            response.success(res, result, "Success create a Category");
+            const payload = { ...req.body, createdBy: req.user?.id } as TEvent;
+            await eventDAO.validate(payload);
+            const result = await EventModel.create(payload);
+            response.success(res, result, "Success Create Event");
+
         } catch (error) {
-            response.error(res, error, "Failed Create Category");
+            response.error(res, error, "Failed to create event");
         }
     },
 
     async findAll(req: IReqUser, res: Response) {
         console.log("--------------------------------------");
-        console.log("Masuk di controller Category Find All");
+        console.log("Masuk di controller Event Find All");
         console.log("--------------------------------------");
-        const { page = 1, limit = 10, search } = req.query as unknown as IPaginationQuery;
-
         try {
-            const query = {};
+            const { limit = 10, page = 1, search } = req.query as unknown as IPaginationQuery;
+
+            const query: FilterQuery<TEvent> = {};
+
             if (search) {
                 Object.assign(query, {
-                    $or: [
-                        {
-                            name: { $regex: search, $options: "i" },
-                        },
-                        {
-                            description: { $regex: search, $options: "i" },
-                        }
-                    ]
+                    ...query,
+                    $text: {
+                        $search: search,
+                    },
                 });
             }
             console.log("MongoDB Query:", JSON.stringify(query, null, 2));
 
-            // const result = await CategoryModel.find(query)
+            // const result = await EventModel.find(query)
             //     .limit(limit)
             //     .skip((page - 1) * limit)
             //     .sort({ createdAt: -1 })
             //     .exec();
+            // const count = await EventModel.countDocuments(query);
 
-            // const count = await CategoryModel.countDocuments(query);
-            // response.pagination(res, result, {
-            //     total: count,
-            //     totalPages: Math.ceil(count / limit),
-            //     current: page
-            // }, "Success find All category");
 
-            // Eksekusi pencarian dan count secara paralel untuk efisiensi
             const [result, count] = await Promise.all([
-                CategoryModel.find(query)
+                EventModel.find(query)
                     .limit(limit)
                     .skip((page - 1) * limit)
                     .sort({ createdAt: -1 })
                     .exec(),
-                CategoryModel.countDocuments(query)
+                EventModel.countDocuments(query)
             ]);
 
             console.log("--------------------------------------");
@@ -68,67 +62,84 @@ export default {
                 total: count,
                 totalPages: Math.ceil(count / limit),
                 current: page
-            }, "Success find All category");
+            }, "Success find All Event");
 
         } catch (error) {
-            response.error(res, error, "Failed Find All Category");
+            response.error(res, error, "Failed to create event");
         }
     },
 
     async findOne(req: IReqUser, res: Response) {
         console.log("--------------------------------------");
-        console.log("Masuk di controller Category Find One");
+        console.log("Masuk di controller Event Find One");
         console.log("--------------------------------------");
         try {
-
             const { id } = req.params;
-            const result = await CategoryModel.findById(id);
+            const result = await EventModel.findById(id);
             console.log("Search by id : ", id);
             console.log("result : ", result);
             console.log("--------------------------------------");
 
-            response.success(res, result, "Success find one category");
-
+            response.success(res, result, "Success find one Event");
         } catch (error) {
-            response.error(res, error, "Failed Find One Category");
+            response.error(res, error, "Failed find one Event");
         }
     },
 
-    async update(req: IReqUser, res: Response) {
+    async Update(req: IReqUser, res: Response) {
         console.log("--------------------------------------");
-        console.log("Masuk di controller Category Updated");
+        console.log("Masuk di controller Event Updated");
         console.log("--------------------------------------");
         try {
             const { id } = req.params;
-            const result = await CategoryModel.findByIdAndUpdate(id, req.body, {
+            const result = await EventModel.findByIdAndUpdate(id, req.body, {
                 new: true,
             });
+
             console.log("Update by id : ", id);
             console.log("Request Body : ", req.body);
             console.log("result : ", result);
             console.log("--------------------------------------");
-            response.success(res, result, "Success update category");
+            response.success(res, result, "Success update Event");
         } catch (error) {
-            response.error(res, error, "Failed Update Category");
+            response.error(res, error, "Failed to update event");
         }
     },
 
     async remove(req: IReqUser, res: Response) {
         console.log("--------------------------------------");
-        console.log("Masuk di controller Category Remove");
+        console.log("Masuk di controller Event Remove");
         console.log("--------------------------------------");
+
         try {
             const { id } = req.params;
-            const result = await CategoryModel.findByIdAndDelete(id, {
+            const result = await EventModel.findByIdAndDelete(id, {
                 new: true
             });
 
             console.log("Remove by id : ", id);
             console.log("result : ", result);
             console.log("--------------------------------------");
-            response.success(res, result, "Success remove category");
+            response.success(res, result, "Success remove Event");
         } catch (error) {
-            response.error(res, error, "Failed Remove Category");
+            response.error(res, error, "Failed to remove event");
         }
     },
-}
+
+    async findOneBySlug(req: IReqUser, res: Response) {
+        console.log("--------------------------------------");
+        console.log("Masuk di controller Event find One By Slug");
+        console.log("--------------------------------------");
+        try {
+            const { slug } = req.params;
+            const result = await EventModel.findOne({ slug });
+
+            console.log("Find by slug : ", slug);
+            console.log("result : ", result);
+            console.log("--------------------------------------");
+            response.success(res, result, "Success find by slug");
+        } catch (error) {
+            response.error(res, error, "Failed find by slug");
+        }
+    },
+};

@@ -25,7 +25,18 @@ const CategorySchema = new Schema<Category>({
         required: true,
     },
 }, {
-    timestamps: true
+    // timestamps: true
+    timestamps: { currentTime: () => new Date() },
+    toJSON: { getters: true, virtuals: true },
+    toObject: { getters: true, virtuals: true },
+});
+
+// 👉 **Getter untuk format waktu lebih mudah dibaca**
+CategorySchema.path("createdAt").get(function (value: Date) {
+    return value ? value.toLocaleString("id-ID", { timeZone: "Asia/Jakarta" }) : null;
+});
+CategorySchema.path("updatedAt").get(function (value: Date) {
+    return value ? value.toLocaleString("id-ID", { timeZone: "Asia/Jakarta" }) : null;
 });
 
 const CategoryModel = mongoose.model('Category', CategorySchema);

@@ -155,7 +155,9 @@ export default {
     },
 
     async login(req: Request, res: Response) {
-
+        console.log("--------------------------------------");
+        console.log("Masuk di controller Auth Login");
+        console.log("--------------------------------------");
         /**
             #swagger.tags = ['Auth']
             #swagger.requestBody = {
@@ -163,12 +165,13 @@ export default {
             schema:{$ref:"#/components/schemas/LoginRequest"}
             }
          */
-
         const { indentifier, password } =
             req.body as unknown as TLogin;
+        console.log("Req Login dari:", indentifier);
+        console.log("--------------------------------------");
         try {
             // Ambil data user berdasarkan "indentifier" -> email dan username
-
+            console.log("🔎 Mencari user berdasarkan indentifier...");
             const userByIndentifier = await UserModel.findOne({
                 $or: [
                     {
@@ -181,21 +184,32 @@ export default {
                 isActive: true,
             });
             if (!userByIndentifier) {
+                console.log("❌ User tidak ditemukan:", indentifier);
                 return response.unauthorized(res, "User not Found");
             }
+
+            console.log("✅ User ditemukan:", userByIndentifier.username || userByIndentifier.email);
+            console.log("🔑 Memvalidasi password...");
 
             // Validasi Password
             const validatePassword: boolean =
                 encrypt(password) === userByIndentifier.password;
 
             if (!validatePassword) {
+                console.log("❌ Password salah untuk:", indentifier);
                 return response.unauthorized(res, "User not Found");
             }
+
+            console.log("✅ Password valid! 🔐");
+            console.log("🛠️ Membuat token autentikasi...");
 
             const token = generateToken({
                 id: userByIndentifier._id,
                 role: userByIndentifier.role,
             });
+
+            console.log("🎉 Login berhasil! Token:", token);
+            console.log("--------------------------------------");
 
             // res.status(200).json({
             //     message: "Login Success",
@@ -206,6 +220,8 @@ export default {
 
 
         } catch (error) {
+            console.log("❌ Terjadi kesalahan saat login:", error);
+            console.log("--------------------------------------");
             response.error(res, error, "Login Failed");
         }
     },
