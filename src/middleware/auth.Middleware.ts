@@ -22,6 +22,7 @@ export default (req: Request, res: Response, next: NextFunction) => {
     }
 
     const user = getUserData(accessToken);
+    console.log("Success get user", user);
     if (!user) {
         return response.unauthorized(res);
     }

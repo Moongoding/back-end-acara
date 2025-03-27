@@ -24,8 +24,8 @@ const doc = {
         },
         schemas: {
             LoginRequest: {
-                "indentifier": "krisma",
-                "password": "password123",
+                "indentifier": "Bee",
+                "password": "password123"
             },
             RegisterRequest: {
                 fullName: "Joni Joni",
@@ -36,6 +36,28 @@ const doc = {
             },
             ActivationRequest: {
                 code: "AudioBufferSourceNode",
+            },
+            RemoveMediaRequest: {
+                fileUrl: "",
+            },
+            CreateCategoryRequest: {
+                name: "",
+                description: "",
+                icon: ""
+            },
+            CreateEventRequest: {
+                "name": "",
+                "banner": "FileUrl banner",
+                "category": "category objectId",
+                "description": "",
+                "startDate": "yyyy-mm-dd hh:mm:ss",
+                "endDate": "yyyy-mm-dd hh:mm:ss",
+                "location": {
+                    "region": "region id",
+                    "coordinates": [-0, 0],
+                },
+                "isOnline": "false",
+                "isFeatured": "true",
             },
         },
     },
