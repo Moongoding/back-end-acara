@@ -1,10 +1,5 @@
 import mongoose, { SchemaType, SchemaTypeOptions } from "mongoose";
 import { encrypt } from "../utills/encryption";
-import { renderMailHtml, sendMail } from "../utills/mail/mail";
-import { CallbackError } from 'mongoose';
-import { render } from "ejs";
-import { register } from "ts-node";
-import { CLIENT_HOST, EMAIL_SMTP_USER } from "../utills/env";
 import { ROLES } from "../utills/constanst";
 
 
@@ -57,9 +52,21 @@ const UserSchema = new Schema<User>({
         type: Schema.Types.String,
     }
 }, {
-    timestamps: true,
+    // timestamps: true,
+    timestamps: { currentTime: () => new Date() },
+    toJSON: { getters: true, virtuals: true },
+    toObject: { getters: true, virtuals: true },
 });
 UserSchema.index({ email: 1 }, { unique: true });
+
+// 👉 **Getter untuk format waktu lebih mudah dibaca**
+UserSchema.path("createdAt").get(function (value: Date) {
+    return value ? value.toLocaleString("id-ID", { timeZone: "Asia/Jakarta" }) : null;
+});
+UserSchema.path("updatedAt").get(function (value: Date) {
+    return value ? value.toLocaleString("id-ID", { timeZone: "Asia/Jakarta" }) : null;
+});
+
 
 // Middleware untuk mengenkripsi password dan generate activation code sebelum disimpan
 UserSchema.pre("save", function (next) {

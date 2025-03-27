@@ -105,8 +105,6 @@ export default {
             console.log("✅ User berhasil dibuat, tetapi belum dikomit ke database.");
             console.log("------------------------")
 
-
-
             console.log("------------------------")
             console.log("✉️ Menyiapkan email aktivasi...");
             console.log("------------------------")
@@ -132,11 +130,21 @@ export default {
             });
 
             // Jika email berhasil dikirim, commit transaksi
-            const result = await session.commitTransaction();
+            await session.commitTransaction();
             session.endSession();
-            console.log("🎉 Data user dan email aktivasi berhasil disimpan!");
+            console.log("🎉 Data user dan email aktivasi berhasil disimpan!", user);
 
-            response.success(res, result, "Registrasi berhasil! Silakan cek email untuk aktivasi akun.");
+            // Mengembalikan data user yang sudah didaftarkan di ambil dari const user
+            const userData = {
+                id: user._id,
+                fullName: user.fullName,
+                username: user.username,
+                email: user.email,
+                createdAt: user.createdAt,
+                isActive: user.isActive, // Jika ada
+            };
+
+            response.success(res, userData, "Registrasi berhasil! Silakan cek email untuk aktivasi akun.");
 
         } catch (error: any) {
             console.error("❌ Error dalam registrasi:", error.message);
