@@ -97,7 +97,7 @@ router.delete('/media/remove', [
         #swagger.requestBody = {
             required:true,
             schema : {
-                $ref: "#/components/schema/RemoveMediaRequest"
+                $ref: "#/components/schemas/RemoveMediaRequest"
             }
         }
     */
