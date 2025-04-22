@@ -12,7 +12,19 @@ export default {
             const result = await EventModel.create(payload);
             response.success(res, result, "Success Create Event");
 
-        } catch (error) {
+        } catch (error: any) {
+            if (error.code === 11000) {
+                const field = Object.keys(error.keyPattern)[0];
+                const value = error.keyValue[field];
+                return res.status(400).json({
+                    status: 400,
+                    message: `${field === "slug" ? "Nama acara" : field} sudah digunakan.`,
+                    field,
+                    value,
+                    code: 11000,
+                });
+            }
+
             response.error(res, error, "Failed to create event");
         }
     },
