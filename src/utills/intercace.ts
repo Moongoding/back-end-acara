@@ -23,4 +23,7 @@ export interface IPaginationQuery {
     page: number;
     limit: number;
     search: string;
+    isOnline?: string;
+    isFeatured?: string;
+    isPublish?: string;
 }

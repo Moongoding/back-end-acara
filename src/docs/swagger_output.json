@@ -566,8 +566,8 @@
           }
         ],
         "responses": {
-          "default": {
-            "description": ""
+          "400": {
+            "description": "Bad Request"
           }
         },
         "security": [
@@ -616,6 +616,33 @@
             "in": "query",
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "isOnline",
+            "in": "query",
+            "description": "Filter event online (true/false)",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "isFeatured",
+            "in": "query",
+            "description": "Filter event unggulan (true/false)",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "isPublish",
+            "in": "query",
+            "description": "Filter event yang sudah publish (true/false)",
+            "required": false,
+            "schema": {
+              "type": "boolean"
             }
           }
         ],
@@ -898,6 +925,10 @@
                 "items": {
                   "type": "number"
                 }
+              },
+              "address": {
+                "type": "string",
+                "example": ""
               }
             }
           },
@@ -908,6 +939,10 @@
           "isFeatured": {
             "type": "string",
             "example": "true"
+          },
+          "isPublish": {
+            "type": "string",
+            "example": "false"
           }
         },
         "xml": {

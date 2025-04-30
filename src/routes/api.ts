@@ -205,9 +205,32 @@ router.post("/events", [authMiddleware, aclMiddleware([ROLES.ADMIN])], eventCont
 );
 router.get("/events", eventController.findAll
     /*
-        #swagger.tags = ['Events']
-    */
+    #swagger.tags = ['Events']
+    #swagger.parameters['isOnline'] = {
+        in: 'query',
+        name: 'isOnline',
+        description: 'Filter event online (true/false)',
+        required: false,
+        schema: { type: 'boolean' }
+    }
+    #swagger.parameters['isFeatured'] = {
+        in: 'query',
+        name: 'isFeatured',
+        description: 'Filter event unggulan (true/false)',
+        required: false,
+        schema: { type: 'boolean' }
+    }
+    #swagger.parameters['isPublish'] = {
+        in: 'query',
+        name: 'isPublish',
+        description: 'Filter event yang sudah publish (true/false)',
+        required: false,
+        schema: { type: 'boolean' }
+    }
+*/
+
 );
+
 router.get("/events/:id", eventController.findOne
     /*
         #swagger.tags = ['Events']

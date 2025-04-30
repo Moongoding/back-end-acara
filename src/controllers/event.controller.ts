@@ -34,7 +34,14 @@ export default {
         console.log("Masuk di controller Event Find All");
         console.log("--------------------------------------");
         try {
-            const { limit = 10, page = 1, search } = req.query as unknown as IPaginationQuery;
+            const {
+                limit = 10,
+                page = 1,
+                search,
+                isOnline,
+                isFeatured,
+                isPublish
+            } = req.query as unknown as IPaginationQuery;
 
             const query: FilterQuery<TEvent> = {};
 
@@ -46,6 +53,12 @@ export default {
                     },
                 });
             }
+
+            // ✅ Tambahkan filter boolean jika ada query-nya
+            if (isOnline !== undefined) query.isOnline = isOnline === "true";
+            if (isFeatured !== undefined) query.isFeatured = isFeatured === "true";
+            if (isPublish !== undefined) query.isPublish = isPublish === "true";
+
             console.log("MongoDB Query:", JSON.stringify(query, null, 2));
 
             // const result = await EventModel.find(query)
