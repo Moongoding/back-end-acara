@@ -8,6 +8,7 @@ import mediaController from "../controllers/media.controller";
 import categoryController from "../controllers/category.controller";
 import regionController from "../controllers/region.controller";
 import eventController from "../controllers/event.controller";
+import ticketController from "../controllers/ticket.controller";
 // import dummyController from "../controllers/dummy.controller";
 
 const router = express.Router();
@@ -105,7 +106,9 @@ router.delete('/media/remove', [
 // End Api Router Media
 
 // Start Api Router Category
-router.post('/category', [authMiddleware, aclMiddleware([ROLES.ADMIN])], categoryController.create
+router.post('/category',
+    [authMiddleware, aclMiddleware([ROLES.ADMIN])],
+    categoryController.create
     /*
     #swagger.tags = ['Category']
     #swagger.security = [{
@@ -120,17 +123,19 @@ router.post('/category', [authMiddleware, aclMiddleware([ROLES.ADMIN])], categor
     */
 );
 
-router.get('/category', categoryController.findAll
+router.get('/category', authMiddleware, categoryController.findAll
     /*
     #swagger.tags = ['Category']
     */
 );
-router.get('/category/:id', categoryController.findOne
+router.get('/category/:id', authMiddleware, categoryController.findOne
     /*
     #swagger.tags = ['Category']
     */
 );
-router.put('/category/:id', [authMiddleware, aclMiddleware([ROLES.ADMIN])], categoryController.update
+router.put('/category/:id',
+    [authMiddleware, aclMiddleware([ROLES.ADMIN])],
+    categoryController.update
     /*
     #swagger.tags = ['Category']
     #swagger.security = [{
@@ -144,7 +149,9 @@ router.put('/category/:id', [authMiddleware, aclMiddleware([ROLES.ADMIN])], cate
     }
     */
 );
-router.delete('/category/:id', [authMiddleware, aclMiddleware([ROLES.ADMIN])], categoryController.remove
+router.delete('/category/:id',
+    [authMiddleware, aclMiddleware([ROLES.ADMIN])],
+    categoryController.remove
     /*
     #swagger.tags = ['Category']
     #swagger.security = [{
@@ -155,32 +162,32 @@ router.delete('/category/:id', [authMiddleware, aclMiddleware([ROLES.ADMIN])], c
 // End Api Router Category
 
 // Start Api Router Region
-router.get("/regions", regionController.getAllProvinces
+router.get("/regions", authMiddleware, regionController.getAllProvinces
     /*
     #swagger.tags = ['Regions']
     */
 );
-router.get("/regions/:id/province", regionController.getProvince
+router.get("/regions/:id/province", authMiddleware, regionController.getProvince
     /*
     #swagger.tags = ['Regions']
     */
 );
-router.get("/regions/:id/regency", regionController.getRegency
+router.get("/regions/:id/regency", authMiddleware, regionController.getRegency
     /*
     #swagger.tags = ['Regions']
     */
 );
-router.get("/regions/:id/district", regionController.getDistrict
+router.get("/regions/:id/district", authMiddleware, regionController.getDistrict
     /*
     #swagger.tags = ['Regions']
     */
 );
-router.get("/regions/:id/village", regionController.getVillage
+router.get("/regions/:id/village", authMiddleware, regionController.getVillage
     /*
     #swagger.tags = ['Regions']
     */
 );
-router.get("/regions-search", regionController.findByCity
+router.get("/regions-search", authMiddleware, regionController.findByCity
     /*
     #swagger.tags = ['Regions']
     */
@@ -189,7 +196,9 @@ router.get("/regions-search", regionController.findByCity
 
 
 // Start Api Router Event
-router.post("/events", [authMiddleware, aclMiddleware([ROLES.ADMIN])], eventController.create
+router.post("/events",
+    [authMiddleware, aclMiddleware([ROLES.ADMIN])],
+    eventController.create
     /*
         #swagger.tags = ['Events']
         #swagger.security = [{
@@ -203,7 +212,7 @@ router.post("/events", [authMiddleware, aclMiddleware([ROLES.ADMIN])], eventCont
         }
         */
 );
-router.get("/events", eventController.findAll
+router.get("/events", authMiddleware, eventController.findAll
     /*
     #swagger.tags = ['Events']
     #swagger.parameters['isOnline'] = {
@@ -231,12 +240,14 @@ router.get("/events", eventController.findAll
 
 );
 
-router.get("/events/:id", eventController.findOne
+router.get("/events/:id", authMiddleware, eventController.findOne
     /*
         #swagger.tags = ['Events']
     */
 );
-router.put("/events/:id", [authMiddleware, aclMiddleware([ROLES.ADMIN])], eventController.Update
+router.put("/events/:id",
+    [authMiddleware, aclMiddleware([ROLES.ADMIN])],
+    eventController.Update
     /*
         #swagger.tags = ['Events']
         #swagger.security = [{
@@ -250,7 +261,10 @@ router.put("/events/:id", [authMiddleware, aclMiddleware([ROLES.ADMIN])], eventC
         }
     */
 );
-router.delete("/events/:id", [authMiddleware, aclMiddleware([ROLES.ADMIN])], eventController.remove
+router.delete("/events/:id", [
+    authMiddleware,
+    aclMiddleware([ROLES.ADMIN])],
+    eventController.remove
     /*
         #swagger.tags = ['Events']
         #swagger.security = [{
@@ -258,7 +272,7 @@ router.delete("/events/:id", [authMiddleware, aclMiddleware([ROLES.ADMIN])], eve
         }]
     */
 );
-router.get("/events/:slug/slug", eventController.findOneBySlug
+router.get("/events/:slug/slug", authMiddleware, eventController.findOneBySlug
     /*
     #swagger.tags = ['Events']
     #swagger.security = [{
@@ -267,6 +281,30 @@ router.get("/events/:slug/slug", eventController.findOneBySlug
     */
 );
 // End Api Router Event
+
+
+// Start Api Router Ticket
+router.post("/tickets", [
+    authMiddleware,
+    aclMiddleware([ROLES.ADMIN])],
+    ticketController.create);
+
+router.get("/tickets", authMiddleware, ticketController.findAll);
+
+router.get("/tickets/:id", authMiddleware, ticketController.findOne);
+
+router.put("/tickets/:id", [
+    authMiddleware,
+    aclMiddleware([ROLES.ADMIN])],
+    ticketController.update);
+
+router.delete("/tickets/:id", [
+    authMiddleware,
+    aclMiddleware([ROLES.ADMIN])],
+    ticketController.remove);
+
+router.get("/tickets/:eventId/events", authMiddleware, ticketController.findAllByEvent);
+// End Api Router Ticket
 
 // router.get('/dummy', dummyController.dummy);
 
