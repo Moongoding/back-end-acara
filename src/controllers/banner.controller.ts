@@ -42,7 +42,6 @@ export default {
                 .skip((page - 1) * limit)
                 .sort({ createdAt: -1 })
                 .exec();
-
             const count = await BannerModel.countDocuments(query);
 
             response.pagination(res, result, {
@@ -60,6 +59,10 @@ export default {
         try {
             const { id } = req.params;
             const result = await BannerModel.findById(id);
+
+            if (!result) {
+                return response.notFound(res, 'Failed find one a Banner')
+            }
 
             response.success(res, result, "success find Banner");
         } catch (error) {
