@@ -2,6 +2,7 @@ import { Response } from "express";
 import { IPaginationQuery, IReqUser } from "../utills/intercace";
 import CategoryModel, { categoryDAO } from "../models/category.model";
 import response from "../utills/response";
+import { isValidObjectId } from "mongoose";
 
 export default {
     async create(req: IReqUser, res: Response) {
@@ -79,16 +80,18 @@ export default {
         console.log("--------------------------------------");
         console.log("Masuk di controller Category Find One");
         console.log("--------------------------------------");
+        const { id } = req.params;
         try {
-
-            const { id } = req.params;
-            const result = await CategoryModel.findById(id);
-            if (!result) {
-                return response.notFound(res, 'Failed find one a Category')
+            if (!isValidObjectId(id)) {
+                console.warn("⚠️ [FIND ONE] Invalid ID:", id);
+                return response.notFound(res, '[FIND ONE] Invalid ID:');
             }
-            console.log("Search by id : ", id);
-            console.log("result : ", result);
-            console.log("--------------------------------------");
+            const result = await CategoryModel.findById(id);
+
+            if (!result) {
+                console.warn("⚠️ [FIND ONE] Not found:", id);
+                return response.notFound(res, '[FIND ONE] Not found:');
+            }
 
             response.success(res, result, "Success find one category");
 
@@ -101,11 +104,22 @@ export default {
         console.log("--------------------------------------");
         console.log("Masuk di controller Category Updated");
         console.log("--------------------------------------");
+        const { id } = req.params;
         try {
-            const { id } = req.params;
+            if (!isValidObjectId(id)) {
+                console.warn("⚠️ [UPDATE] Invalid ID:", id);
+                return response.notFound(res, '[UPDATE] Invalid ID');
+            }
+
             const result = await CategoryModel.findByIdAndUpdate(id, req.body, {
                 new: true,
             });
+
+            if (!result) {
+                console.warn("⚠️ [UPDATE] Not found for update:", id);
+                return response.notFound(res, 'Not found for update');
+            }
+
             console.log("Update by id : ", id);
             console.log("Request Body : ", req.body);
             console.log("result : ", result);
@@ -120,14 +134,22 @@ export default {
         console.log("--------------------------------------");
         console.log("Masuk di controller Category Remove");
         console.log("--------------------------------------");
+        const { id } = req.params;
         try {
-            const { id } = req.params;
+            if (!isValidObjectId(id)) {
+                console.warn("⚠️ [REMOVE] Invalid ID:", id);
+                return response.notFound(res, '[REMOVE] Invalid ID');
+            }
+
             const result = await CategoryModel.findByIdAndDelete(id, {
                 new: true
             });
 
-            console.log("Remove by id : ", id);
-            console.log("result : ", result);
+            if (!result) {
+                console.warn("⚠️ [REMOVE] Not found for Remove:", id);
+                return response.notFound(res, 'Not found for Remove');
+            }
+
             console.log("--------------------------------------");
             response.success(res, result, "Success remove category");
         } catch (error) {

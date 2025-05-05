@@ -3,21 +3,26 @@ import { IPaginationQuery, IReqUser } from "../utills/intercace";
 import response from "../utills/response";
 import TicketModel, { TypeTicket, ticketDao } from "../models/ticket.model";
 import { FilterQuery, isValidObjectId } from "mongoose";
-import { object } from "yup";
-
 
 export default {
     async create(req: IReqUser, res: Response) {
+        console.log("📝 [CREATE TICKET] Request body:", req.body);
+
         try {
             await ticketDao.validate(req.body);
             const result = await TicketModel.create(req.body);
 
-            response.success(res, result, 'Success to Create Ticket')
+            console.log("✅ [CREATE TICKET] Ticket created:", result);
+            response.success(res, result, 'Success to Create Ticket');
         } catch (error) {
-            response.error(res, error, 'Failed to Create Ticket')
+            console.error("❌ [CREATE TICKET] Failed:", error);
+            response.error(res, error, 'Failed to Create Ticket');
         }
     },
+
     async findAll(req: IReqUser, res: Response) {
+        console.log("📄 [FIND ALL TICKETS] Query params:", req.query);
+
         try {
             const {
                 limit = 10,
@@ -25,17 +30,16 @@ export default {
                 search,
             } = req.query as unknown as IPaginationQuery;
 
-
             const query: FilterQuery<TypeTicket> = {};
 
             if (search) {
                 Object.assign(query, {
                     ...query,
-                    $text: {
-                        $search: search,
-                    },
+                    $text: { $search: search },
                 });
             }
+
+            console.log("🔍 [FIND ALL TICKETS] Final query:", query);
 
             const result = await TicketModel.find(query)
                 .populate("events")
@@ -46,67 +50,113 @@ export default {
 
             const count = await TicketModel.countDocuments(query);
 
+            console.log("✅ [FIND ALL TICKETS] Found:", result.length, "tickets");
             response.pagination(res, result, {
                 total: count,
                 current: page,
                 totalPages: Math.ceil(count / limit)
-            }, "Succes find All Ticket");
-
+            }, "Success find All Ticket");
         } catch (error) {
-            response.error(res, error, 'Failed to Find All Ticket')
+            console.error("❌ [FIND ALL TICKETS] Failed:", error);
+            response.error(res, error, 'Failed to Find All Ticket');
         }
     },
 
     async findOne(req: IReqUser, res: Response) {
+        const { id } = req.params;
+        console.log("🔎 [FIND ONE TICKET] ID:", id);
+
         try {
-            const { id } = req.params;
-            const result = await TicketModel.findById(id);
-            if (!result) {
-                return response.notFound(res, 'Failed find one a Ticket')
+            if (!isValidObjectId(id)) {
+                console.warn("⚠️ [FIND ONE TICKET] Invalid ID format");
+                return response.notFound(res, '[FIND ONE TICKET] Invalid ID format');
             }
 
-            response.success(res, result, "success find Ticket");
+            const result = await TicketModel.findById(id);
+
+            if (!result) {
+                console.warn("⚠️ [FIND ONE TICKET] Ticket not found");
+                return response.notFound(res, '[FIND ONE TICKET] Ticket not found');
+            }
+
+            console.log("✅ [FIND ONE TICKET] Found:", result);
+            response.success(res, result, "Success find Ticket");
         } catch (error) {
-            response.error(res, error, 'Failed to Find One Ticket')
+            console.error("❌ [FIND ONE TICKET] Failed:", error);
+            response.error(res, error, 'Failed to Find One Ticket');
         }
     },
+
     async update(req: IReqUser, res: Response) {
+        const { id } = req.params;
+        console.log("✏️ [UPDATE TICKET] ID:", id);
+        console.log("✏️ [UPDATE TICKET] Body:", req.body);
+
         try {
-            const { id } = req.params;
+            if (!isValidObjectId(id)) {
+                console.warn("⚠️ [UPDATE TICKET] Invalid ID");
+                return response.notFound(res, '[UPDATE TICKET] Invalid ID');
+            }
+
             const result = await TicketModel.findByIdAndUpdate(id, req.body, {
                 new: true,
             });
 
-            response.success(res, result, "success to Update Ticket");
+            if (!result) {
+                console.warn("⚠️ [UPDATE TICKET] Ticket not found");
+                return response.notFound(res, '[UPDATE TICKET] Ticket not found');
+            }
+
+            console.log("✅ [UPDATE TICKET] Updated:", result);
+            response.success(res, result, "Success to Update Ticket");
         } catch (error) {
-            response.error(res, error, 'Failed to Update Ticket')
+            console.error("❌ [UPDATE TICKET] Failed:", error);
+            response.error(res, error, 'Failed to Update Ticket');
         }
     },
+
     async remove(req: IReqUser, res: Response) {
-        try {
-            const { id } = req.params;
-            const result = await TicketModel.findByIdAndDelete(id, {
-                new: true,
-            });
+        const { id } = req.params;
+        console.log("🗑️ [REMOVE TICKET] ID:", id);
 
-            response.success(res, result, "success to Remove Ticket");
+        try {
+            if (!isValidObjectId(id)) {
+                console.warn("⚠️ [REMOVE] Invalid ID:", id);
+                return response.notFound(res, '[REMOVE] Invalid ID');
+            }
+
+            const result = await TicketModel.findByIdAndDelete(id);
+
+            if (!result) {
+                console.warn("⚠️ [REMOVE] Not found for Remove:", id);
+                return response.notFound(res, 'Not found for Remove');
+            }
+
+            console.log("✅ [REMOVE TICKET] Deleted:", result);
+            response.success(res, result, "Success to Remove Ticket");
         } catch (error) {
-            response.error(res, error, 'Failed to Remove Ticket')
+            console.error("❌ [REMOVE TICKET] Failed:", error);
+            response.error(res, error, 'Failed to Remove Ticket');
         }
     },
-    async findAllByEvent(req: IReqUser, res: Response) {
-        try {
-            const { eventId } = req.params;
 
+    async findAllByEvent(req: IReqUser, res: Response) {
+        const { eventId } = req.params;
+        console.log("🎫 [FIND TICKETS BY EVENT] Event ID:", eventId);
+
+        try {
             if (!isValidObjectId(eventId)) {
+                console.warn("⚠️ [FIND TICKETS BY EVENT] Invalid Event ID");
                 return response.error(res, null, "Ticket Not Found");
             }
 
             const result = await TicketModel.find({ events: eventId }).exec();
-            response.success(res, result, "Success Find All Ticket by an Event");
 
+            console.log("✅ [FIND TICKETS BY EVENT] Found:", result.length, "tickets");
+            response.success(res, result, "Success Find All Ticket by an Event");
         } catch (error) {
-            response.error(res, error, 'Failed to Find Event by Ticket')
+            console.error("❌ [FIND TICKETS BY EVENT] Failed:", error);
+            response.error(res, error, 'Failed to Find Event by Ticket');
         }
     },
-}
+};

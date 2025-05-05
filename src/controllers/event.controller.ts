@@ -2,7 +2,7 @@ import { Response } from "express";
 import { IPaginationQuery, IReqUser } from "../utills/intercace";
 import response from "../utills/response";
 import EventModel, { TEvent, eventDAO } from "../models/event.model";
-import { FilterQuery } from "mongoose";
+import { FilterQuery, isValidObjectId } from "mongoose";
 
 export default {
     async create(req: IReqUser, res: Response) {
@@ -98,15 +98,19 @@ export default {
         console.log("--------------------------------------");
         console.log("Masuk di controller Event Find One");
         console.log("--------------------------------------");
+        const { id } = req.params;
         try {
-            const { id } = req.params;
-            const result = await EventModel.findById(id);
-            if (!result) {
-                return response.notFound(res, 'Failed find one a Event')
+            if (!isValidObjectId(id)) {
+                console.warn("⚠️ [UPDATE] Invalid ID:", id);
+                return response.notFound(res, '[UPDATE] Invalid ID');
             }
-            console.log("Search by id : ", id);
-            console.log("result : ", result);
-            console.log("--------------------------------------");
+
+            const result = await EventModel.findById(id);
+
+            if (!result) {
+                console.warn("⚠️ [FIND ONE] Not found:", id);
+                return response.notFound(res, '[FIND ONE] Not found:');
+            }
 
             response.success(res, result, "Success find one Event");
         } catch (error) {
@@ -118,15 +122,22 @@ export default {
         console.log("--------------------------------------");
         console.log("Masuk di controller Event Updated");
         console.log("--------------------------------------");
+        const { id } = req.params;
         try {
-            const { id } = req.params;
+            if (!isValidObjectId(id)) {
+                console.warn("⚠️ [UPDATE] Invalid ID:", id);
+                return response.notFound(res, '[UPDATE] Invalid ID');
+            }
+
             const result = await EventModel.findByIdAndUpdate(id, req.body, {
                 new: true,
             });
 
-            console.log("Update by id : ", id);
-            console.log("Request Body : ", req.body);
-            console.log("result : ", result);
+            if (!result) {
+                console.warn("⚠️ [UPDATE] Not found for update:", id);
+                return response.notFound(res, 'Not found for update');
+            }
+
             console.log("--------------------------------------");
             response.success(res, result, "Success update Event");
         } catch (error) {
