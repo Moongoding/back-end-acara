@@ -288,23 +288,77 @@ router.get("/events/:slug/slug", authMiddleware, eventController.findOneBySlug
 router.post("/tickets", [
     authMiddleware,
     aclMiddleware([ROLES.ADMIN])],
-    ticketController.create);
+    ticketController.create
+    /*
+    #swagger.tags = ['Tickets']
+    #swagger.security = [{
+        "bearerAuth" : {}
+    }]
+    #swagger.requestBody = {
+        required:true,
+        schema:{
+            $ref: "#/components/schemas/CreateTicketsRequest"
+        }
+    }
+    */
+);
 
-router.get("/tickets", authMiddleware, ticketController.findAll);
+router.get("/tickets", authMiddleware, ticketController.findAll
+    /*
+    #swagger.tags = ['Tickets']
+    #swagger.security = [{
+        "bearerAuth" : {}
+    }]
+    */
+);
 
-router.get("/tickets/:id", authMiddleware, ticketController.findOne);
+router.get("/tickets/:id", authMiddleware, ticketController.findOne
+    /*
+    #swagger.tags = ['Tickets']
+    #swagger.security = [{
+        "bearerAuth" : {}
+    }]
+    */
+);
 
 router.put("/tickets/:id", [
     authMiddleware,
     aclMiddleware([ROLES.ADMIN])],
-    ticketController.update);
+    ticketController.update
+    /*
+    #swagger.tags = ['Tickets']
+    #swagger.security = [{
+        "bearerAuth" : {}
+    }]
+    #swagger.requestBody = {
+        required:true,
+        schema:{
+            $ref: "#/components/schemas/CreateTicketsRequest"
+        }
+    }
+    */
+);
 
 router.delete("/tickets/:id", [
     authMiddleware,
     aclMiddleware([ROLES.ADMIN])],
-    ticketController.remove);
+    ticketController.remove
+    /*
+    #swagger.tags = ['Tickets']
+    #swagger.security = [{
+        "bearerAuth" : {}
+    }]
+    */
+);
 
-router.get("/tickets/:eventId/events", authMiddleware, ticketController.findAllByEvent);
+router.get("/tickets/:eventId/events", authMiddleware, ticketController.findAllByEvent
+    /*
+    #swagger.tags = ['Tickets']
+    #swagger.security = [{
+        "bearerAuth" : {}
+    }]
+    */
+);
 // End Api Router Ticket
 
 
@@ -312,21 +366,68 @@ router.get("/tickets/:eventId/events", authMiddleware, ticketController.findAllB
 router.post("/banners", [
     authMiddleware,
     aclMiddleware([ROLES.ADMIN])],
-    bannerController.create);
+    bannerController.create
+    /*
+    #swagger.tags = ['Banners']
+    #swagger.security = [{
+        "bearerAuth" : {}
+    }]
+    #swagger.requestBody = {
+        required:true,
+        schema:{
+            $ref: "#/components/schemas/CreateBannerRequest"
+        }
+    }
+    */
+);
 
-router.get("/banners", authMiddleware, bannerController.findAll);
+router.get("/banners", authMiddleware, bannerController.findAll
+    /*
+    #swagger.tags = ['Banners']
+    #swagger.security = [{
+        "bearerAuth" : {}
+    }]
+    */
+);
 
-router.get("/banners/:id", authMiddleware, bannerController.findOne);
+router.get("/banners/:id", authMiddleware, bannerController.findOne
+    /*
+    #swagger.tags = ['Banners']
+    #swagger.security = [{
+        "bearerAuth" : {}
+    }]
+    */
+);
 
 router.put("/banners/:id", [
     authMiddleware,
     aclMiddleware([ROLES.ADMIN])],
-    bannerController.update);
+    bannerController.update
+    /*
+    #swagger.tags = ['Banners']
+    #swagger.security = [{
+        "bearerAuth" : {}
+    }]
+    #swagger.requestBody = {
+        required:true,
+        schema:{
+            $ref: "#/components/schemas/UpdateBannerRequest"
+        }
+    }
+    */
+);
 
 router.delete("/banners/:id", [
     authMiddleware,
     aclMiddleware([ROLES.ADMIN])],
-    bannerController.remove);
+    bannerController.remove
+    /*
+    #swagger.tags = ['Banners']
+    #swagger.security = [{
+        "bearerAuth" : {}
+    }]
+    */
+);
 
 // End Api Router Banner
 

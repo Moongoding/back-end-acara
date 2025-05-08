@@ -61,6 +61,20 @@ const doc = {
                 "isFeatured": "true",
                 "isPublish": "false"
             },
+            CreateBannerRequest:
+            {
+                "title": "This title 3",
+                "image": "https://res.cloudinary.com/dbsxp7yaw/image/upload/v1744788707/lq6lsgyhtc5tg5zcr1cn.jpg",
+                "isShow": 1
+            },
+            CreateTicketsRequest:
+            {
+                "price": "2500",
+                "name": "Ticket VVIP",
+                "events": "6811a1b799ec508e79fcf09d",
+                "description": "Ticket VVIP description",
+                "quantity": "100"
+            }
         },
     },
 };
