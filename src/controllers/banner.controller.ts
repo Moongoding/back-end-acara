@@ -72,6 +72,7 @@ export default {
                 return response.notFound(res, '[FIND ONE] Invalid ID:');
             }
             const result = await BannerModel.findById(id);
+
             if (!result) {
                 console.warn("⚠️ [FIND ONE] Not found:", id);
                 return response.notFound(res, '[FIND ONE] Not found:');

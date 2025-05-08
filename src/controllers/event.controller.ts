@@ -94,6 +94,60 @@ export default {
         }
     },
 
+
+    // async findAll(req: IReqUser, res: Response) {
+    //     console.log("--------------------------------------");
+    //     console.log("Masuk di controller Event Find All");
+    //     console.log("--------------------------------------");
+    //     try {
+    //         const { limit = 10, page = 1, search } = req.query as unknown as IPaginationQuery;
+
+    //         const query: FilterQuery<TEvent> = {};
+
+    //         if (search) {
+    //             Object.assign(query, {
+    //                 ...query,
+    //                 $text: {
+    //                     $search: search,
+    //                 },
+    //             });
+    //         }
+    //         console.log("MongoDB Query:", JSON.stringify(query, null, 2));
+
+    //         // const result = await EventModel.find(query)
+    //         //     .limit(limit)
+    //         //     .skip((page - 1) * limit)
+    //         //     .sort({ createdAt: -1 })
+    //         //     .exec();
+    //         // const count = await EventModel.countDocuments(query);
+
+
+    //         const [result, count] = await Promise.all([
+    //             EventModel.find(query)
+    //                 .limit(limit)
+    //                 .skip((page - 1) * limit)
+    //                 .sort({ createdAt: -1 })
+    //                 .exec(),
+    //             EventModel.countDocuments(query)
+    //         ]);
+
+    //         console.log("--------------------------------------");
+    //         console.log("Query Result Count:", result.length);
+    //         console.log("Total Documents:", count);
+    //         console.log("--------------------------------------");
+
+    //         response.pagination(res, result, {
+    //             total: count,
+    //             totalPages: Math.ceil(count / limit),
+    //             current: page
+    //         }, "Success find All Event");
+
+    //     } catch (error) {
+    //         response.error(res, error, "Failed to create event");
+    //     }
+    // },
+
+
     async findOne(req: IReqUser, res: Response) {
         console.log("--------------------------------------");
         console.log("Masuk di controller Event Find One");
@@ -149,12 +203,22 @@ export default {
         console.log("--------------------------------------");
         console.log("Masuk di controller Event Remove");
         console.log("--------------------------------------");
+        const { id } = req.params;
 
         try {
-            const { id } = req.params;
+            if (!isValidObjectId(id)) {
+                console.warn("⚠️ [REMOVE] Invalid ID:", id);
+                return response.notFound(res, '[REMOVE] Invalid ID');
+            }
+
             const result = await EventModel.findByIdAndDelete(id, {
                 new: true
             });
+
+            if (!result) {
+                console.warn("⚠️ [REMOVE] Not found for Remove:", id);
+                return response.notFound(res, 'Not found for Remove');
+            }
 
             console.log("Remove by id : ", id);
             console.log("result : ", result);

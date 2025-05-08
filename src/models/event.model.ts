@@ -99,7 +99,7 @@ const EventSchema = new Schema<Event>({
     timestamps: { currentTime: () => new Date() },
     toJSON: { getters: true, virtuals: true },
     toObject: { getters: true, virtuals: true },
-});
+}).index({ name: "text" });
 
 // 👉 **Getter untuk format waktu lebih mudah dibaca**
 EventSchema.path("createdAt").get(function (value: Date) {
