@@ -127,6 +127,9 @@ router.post('/category',
 router.get('/category', authMiddleware, categoryController.findAll
     /*
     #swagger.tags = ['Category']
+    #swagger.security = [{
+        "bearerAuth" : {}
+    }]
     */
 );
 router.get('/category/:id', authMiddleware, categoryController.findOne
@@ -238,7 +241,6 @@ router.get("/events", authMiddleware, eventController.findAll
         schema: { type: 'boolean' }
     }
 */
-
 );
 
 router.get("/events/:id", authMiddleware, eventController.findOne
@@ -359,6 +361,25 @@ router.get("/tickets/:eventId/events", authMiddleware, ticketController.findAllB
     }]
     */
 );
+
+router.delete("/tickets/events/:eventId", [
+    authMiddleware,
+    aclMiddleware([ROLES.ADMIN])],
+    ticketController.deleteTicketByEventId
+    /*
+    #swagger.tags = ['Tickets']
+    #swagger.security = [{
+        "bearerAuth" : {}
+    }]
+    #swagger.parameters['eventId'] = {
+        in: 'path',
+        description: 'ID dari Event yang ingin dihapus semua tiketnya',
+        required: true,
+        type: 'string'
+    }
+    */
+);
+
 // End Api Router Ticket
 
 

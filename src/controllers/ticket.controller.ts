@@ -159,4 +159,29 @@ export default {
             response.error(res, error, 'Failed to Find Event by Ticket');
         }
     },
+
+    async deleteTicketByEventId(req: IReqUser, res: Response) {
+        const { eventId } = req.params;
+        console.log("🗑️ [DELETE TICKETS BY EVENT] Event ID:", eventId);
+
+        try {
+            if (!isValidObjectId(eventId)) {
+                console.warn("⚠️ [DELETE TICKETS BY EVENT] Invalid Event ID:", eventId);
+                return response.notFound(res, '[DELETE TICKETS BY EVENT] Invalid Event ID');
+            }
+
+            const result = await TicketModel.deleteMany({ events: eventId });
+
+            if (result.deletedCount === 0) {
+                console.warn("⚠️ [DELETE TICKETS BY EVENT] No tickets found to delete for Event ID:", eventId);
+                return response.notFound(res, '[DELETE TICKETS BY EVENT] No tickets found for this Event');
+            }
+
+            console.log(`✅ [DELETE TICKETS BY EVENT] Deleted ${result.deletedCount} tickets for eventId:`, eventId);
+            response.success(res, result, `Success to delete ${result.deletedCount} tickets for this Event`);
+        } catch (error) {
+            console.error("❌ [DELETE TICKETS BY EVENT] Failed:", error);
+            response.error(res, error, 'Failed to Delete Tickets by Event');
+        }
+    },
 };

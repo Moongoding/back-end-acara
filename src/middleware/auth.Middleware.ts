@@ -9,6 +9,7 @@ export default (req: Request, res: Response, next: NextFunction) => {
     console.log("--------------------------------------");
     console.log("auth.middleware is running!");
     console.log("--------------------------------------");
+    console.log("Headers:", req.headers);
     const authorization = req.headers.authorization;
     if (!authorization) {
         return response.unauthorized(res);
