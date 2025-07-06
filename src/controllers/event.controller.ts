@@ -1,13 +1,13 @@
 import { Response } from "express";
 import { IPaginationQuery, IReqUser } from "../utills/intercace";
 import response from "../utills/response";
-import EventModel, { TEvent, eventDAO } from "../models/event.model";
+import EventModel, { TypeEvent, eventDAO } from "../models/event.model";
 import { FilterQuery, isValidObjectId } from "mongoose";
 
 export default {
     async create(req: IReqUser, res: Response) {
         try {
-            const payload = { ...req.body, createdBy: req.user?.id } as TEvent;
+            const payload = { ...req.body, createdBy: req.user?.id } as TypeEvent;
             await eventDAO.validate(payload);
             const result = await EventModel.create(payload);
             response.success(res, result, "Success Create Event");
@@ -33,46 +33,41 @@ export default {
         console.log("--------------------------------------");
         console.log("Masuk di controller Event Find All");
         console.log("--------------------------------------");
+
         try {
             const {
-                limit = 10,
-                page = 1,
+                limit = "10",
+                page = "1",
                 search,
+                category,
                 isOnline,
                 isFeatured,
                 isPublish
-            } = req.query as unknown as IPaginationQuery;
+            } = req.query;
 
-            const query: FilterQuery<TEvent> = {};
+            const parsedLimit = parseInt(limit as string, 10);
+            const parsedPage = parseInt(page as string, 10);
 
-            if (search) {
-                Object.assign(query, {
-                    ...query,
-                    $text: {
-                        $search: search,
-                    },
-                });
-            }
+            const buildQuery = () => {
+                const query: FilterQuery<TypeEvent> = {};
 
-            // ✅ Tambahkan filter boolean jika ada query-nya
-            if (isOnline !== undefined) query.isOnline = isOnline === "true";
-            if (isFeatured !== undefined) query.isFeatured = isFeatured === "true";
-            if (isPublish !== undefined) query.isPublish = isPublish === "true";
+                if (search) query.$text = { $search: search as string };
+                if (category) query.category = category;
+                if (isOnline !== undefined) query.isOnline = isOnline === "true";
+                if (isFeatured !== undefined) query.isFeatured = isFeatured === "true";
+                if (isPublish !== undefined) query.isPublish = isPublish === "true";
+
+                return query;
+            };
+
+            const query = buildQuery();
 
             console.log("MongoDB Query:", JSON.stringify(query, null, 2));
 
-            // const result = await EventModel.find(query)
-            //     .limit(limit)
-            //     .skip((page - 1) * limit)
-            //     .sort({ createdAt: -1 })
-            //     .exec();
-            // const count = await EventModel.countDocuments(query);
-
-
             const [result, count] = await Promise.all([
                 EventModel.find(query)
-                    .limit(limit)
-                    .skip((page - 1) * limit)
+                    .limit(parsedLimit)
+                    .skip((parsedPage - 1) * parsedLimit)
                     .sort({ createdAt: -1 })
                     .exec(),
                 EventModel.countDocuments(query)
@@ -85,14 +80,16 @@ export default {
 
             response.pagination(res, result, {
                 total: count,
-                totalPages: Math.ceil(count / limit),
-                current: page
+                totalPages: Math.ceil(count / parsedLimit),
+                current: parsedPage
             }, "Success find All Event");
 
         } catch (error) {
-            response.error(res, error, "Failed to create event");
+            console.error("FindAll Error:", error);
+            response.error(res, error, "Failed to fetch events");
         }
     },
+
 
 
     // async findAll(req: IReqUser, res: Response) {
@@ -102,7 +99,7 @@ export default {
     //     try {
     //         const { limit = 10, page = 1, search } = req.query as unknown as IPaginationQuery;
 
-    //         const query: FilterQuery<TEvent> = {};
+    //         const query: FilterQuery<TypeEvent> = {};
 
     //         if (search) {
     //             Object.assign(query, {

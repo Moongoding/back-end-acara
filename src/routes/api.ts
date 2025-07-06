@@ -219,6 +219,23 @@ router.post("/events",
 router.get("/events", authMiddleware, eventController.findAll
     /*
     #swagger.tags = ['Events']
+        
+    #swagger.parameters['limit'] = {
+        in: 'query',
+        name: 'limit',
+        description: 'Limit jumlah data yang ditampilkan',
+        required: false,
+        schema: { type: 'number', default: 10 }
+    }
+
+    #swagger.parameters['page'] = {
+        in: 'query',
+        name: 'page',
+        description: 'Halaman yang ingin ditampilkan',
+        required: false,
+        schema: { type: 'number', default: 1 }
+    }
+
     #swagger.parameters['isOnline'] = {
         in: 'query',
         name: 'isOnline',
