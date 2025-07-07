@@ -2,6 +2,7 @@ import mongoose, { SchemaType, SchemaTypeOptions } from "mongoose";
 import { encrypt } from "../utills/encryption";
 import { ROLES } from "../utills/constanst";
 
+export const USER_MODEL_NAME = "User";
 
 export interface User {
     fullName: string;
@@ -86,53 +87,7 @@ UserSchema.pre("save", function (next) {
     }
 
     next();
-    // const user = this;
-    // user.password = encrypt(user.password);
-    // // Enkripsi activation code dari ID user + password yang sudah terenkripsi
-    // user.activationCode = encrypt(user._id.toString() + user.password);
-    // // user.activationCode = encrypt(user.id);
 });
-
-// Sekarang fungsinya pindah ke controller
-// UserSchema.post("save", async function (doc, next) {
-//     const user = doc;
-
-//     try {
-
-//         console.log("Fullname:", user.fullName);
-//         console.log("createdAt:", user.createdAt);
-//         console.log("activationLink:", user.activationCode);
-
-
-//         // Render HTML untuk email
-//         const contentMail = await renderMailHtml("registration-success.ejs", {
-//             username: user.username,
-//             fullName: user.fullName,
-//             email: user.email,
-//             createdAt: user.createdAt,
-//             activationLink: `${CLIENT_HOST}/auth/activation?code=${user.activationCode}`,
-//         });
-
-//         // Kirim email
-//         await sendMail({
-//             from: EMAIL_SMTP_USER,
-//             to: user.email,
-//             subject: "Aktivasi Akun Anda",
-//             html: contentMail,
-//         });
-//         console.log("Send Email to:", user.email);
-
-//         next(); // Panggil next() untuk melanjutkan proses setelah email dikirim
-//     } catch (error) {
-//         console.error("Terjadi kesalahan saat mengirim email:", error);
-//         // Jika ada error, kita bisa memanggil next dengan error atau melakukan penanganan lainnya
-//         next(error as CallbackError); // Untuk melanjutkan dengan error jika diperlukan
-//     } finally {
-
-//         // console.log("Proses pengiriman email selesai.");
-//         next();
-//     }
-// });
 
 
 UserSchema.methods.toJSON = function () {
@@ -141,6 +96,6 @@ UserSchema.methods.toJSON = function () {
     return user
 };
 
-const UserModel = mongoose.model("User", UserSchema);
+const UserModel = mongoose.model(USER_MODEL_NAME, UserSchema);
 
 export default UserModel;

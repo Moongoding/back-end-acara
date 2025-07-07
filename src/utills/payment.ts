@@ -16,7 +16,7 @@ export type TypeResponseMidtrans = {
 
 
 export default {
-    async createLin(payload: Payment): Promise<TypeResponseMidtrans> {
+    async createLink(payload: Payment): Promise<TypeResponseMidtrans> {
         const result = await axios.post<TypeResponseMidtrans>(`${MIDTRANS_TRANSACTION_URL}`, payload, {
             headers: {
                 "Content-Type": "application/json",
