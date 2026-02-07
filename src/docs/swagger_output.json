@@ -675,13 +675,6 @@
             }
           },
           {
-            "name": "category",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "limit",
             "in": "query",
             "description": "Limit jumlah data yang ditampilkan",
@@ -706,17 +699,7 @@
             "description": "Halaman yang ingin ditampilkan",
             "required": false,
             "schema": {
-              "type": "object",
-              "properties": {
-                "type": {
-                  "type": "string",
-                  "example": "number"
-                },
-                "default": {
-                  "type": "number",
-                  "example": 1
-                }
-              }
+              "type": "string"
             }
           },
           {

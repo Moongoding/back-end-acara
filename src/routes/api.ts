@@ -236,6 +236,14 @@ router.get("/events", authMiddleware, eventController.findAll
         schema: { type: 'number', default: 1 }
     }
 
+    #swagger.parameters['category'] = {
+        in: 'query',
+        name: 'page',
+        description: 'Halaman yang ingin ditampilkan',
+        required: false,
+        schema: { type: 'string' }
+    }
+
     #swagger.parameters['isOnline'] = {
         in: 'query',
         name: 'isOnline',
